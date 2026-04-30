@@ -1,0 +1,15 @@
+bin/
+obj/
+.vs/
+.vscode/
+
+*.user
+*.suo
+*.rsuser
+
+TestResults/
+coverage/
+publish-check/
+
+*.nupkg
+*.snupkg

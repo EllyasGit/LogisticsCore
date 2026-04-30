@@ -1,26 +1,68 @@
+using LogisticsCore.Models;
+using LogisticsCore.Services;
+using System.Text.Json.Serialization;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddOpenApi();
+builder.Services.AddHealthChecks();
+builder.Services.AddSingleton<IShipmentService, InMemoryShipmentService>();
+builder.Services.ConfigureHttpJsonOptions(options =>
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
 var app = builder.Build();
 
-// 1. "Status" Endpoint - To check if the server is running
-app.MapGet("/", () => "Centiro Logistics Core is Running!");
-
-// 2. "Tracking" Endpoint - Simulates finding a package
-app.MapGet("/track-package", () =>
+if (app.Environment.IsDevelopment())
 {
-    var statuses = new[] { "In Transit", "Out for Delivery", "Delivered", "Delayed at Customs", "Sorting Facility" };
-    var cities = new[] { "Malmö", "Stockholm", "Gothenburg", "Borås", "Copenhagen" };
+    app.MapOpenApi();
+}
 
-    // Create a fake package update
-    var packageUpdate = new
+app.MapGet("/", () => Results.Ok(new ApiStatus(
+        Name: "LogisticsCore",
+        Status: "Running",
+        Description: "Cloud-native shipment tracking API",
+        Timestamp: DateTimeOffset.UtcNow)))
+    .WithName("GetApiStatus")
+    .WithTags("System")
+    .WithOpenApi();
+
+app.MapHealthChecks("/health/live");
+
+var shipments = app.MapGroup("/shipments")
+    .WithTags("Shipments");
+
+shipments.MapGet("/", (IShipmentService shipmentService) =>
+    Results.Ok(shipmentService.GetAllShipments()))
+    .WithName("GetShipments")
+    .WithOpenApi();
+
+shipments.MapGet("/{id}", (string id, IShipmentService shipmentService) =>
+    shipmentService.GetShipment(id) is { } shipment
+        ? Results.Ok(shipment)
+        : Results.NotFound(new ErrorResponse($"Shipment '{id}' was not found.")))
+    .WithName("GetShipmentById")
+    .WithOpenApi();
+
+shipments.MapGet("/{id}/tracking-events", (string id, IShipmentService shipmentService) =>
+    shipmentService.GetTrackingEvents(id) is { } events
+        ? Results.Ok(events)
+        : Results.NotFound(new ErrorResponse($"Shipment '{id}' was not found.")))
+    .WithName("GetShipmentTrackingEvents")
+    .WithOpenApi();
+
+shipments.MapPost("/", (CreateShipmentRequest request, IShipmentService shipmentService) =>
     {
-        PackageId = "CN-" + Random.Shared.Next(1000, 9999),
-        Status = statuses[Random.Shared.Next(statuses.Length)],
-        Location = cities[Random.Shared.Next(cities.Length)],
-        EstimatedDelivery = DateTime.Now.AddDays(Random.Shared.Next(1, 5)),
-        LastScanned = DateTime.Now
-    };
+        var validationErrors = request.Validate();
 
-    return packageUpdate;
-});
+        if (validationErrors.Count > 0)
+        {
+            return Results.BadRequest(new ValidationErrorResponse(validationErrors));
+        }
+
+        var shipment = shipmentService.CreateShipment(request);
+        return Results.Created($"/shipments/{shipment.Id}", shipment);
+    })
+    .WithName("CreateShipment")
+    .WithOpenApi();
 
 app.Run();

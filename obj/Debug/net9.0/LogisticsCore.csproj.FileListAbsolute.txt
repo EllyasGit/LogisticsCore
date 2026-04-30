@@ -31,3 +31,10 @@ C:\Users\ellya\PortfolioProjects\LogisticsCore\obj\Debug\net9.0\refint\Logistics
 C:\Users\ellya\PortfolioProjects\LogisticsCore\obj\Debug\net9.0\LogisticsCore.pdb
 C:\Users\ellya\PortfolioProjects\LogisticsCore\obj\Debug\net9.0\LogisticsCore.genruntimeconfig.cache
 C:\Users\ellya\PortfolioProjects\LogisticsCore\obj\Debug\net9.0\ref\LogisticsCore.dll
+C:\Users\ellya\PortfolioProjects\LogisticsCore\bin\Debug\net9.0\publish-check\web.config
+C:\Users\ellya\PortfolioProjects\LogisticsCore\bin\Debug\net9.0\publish-check\appsettings.Development.json
+C:\Users\ellya\PortfolioProjects\LogisticsCore\bin\Debug\net9.0\publish-check\appsettings.json
+C:\Users\ellya\PortfolioProjects\LogisticsCore\bin\Debug\net9.0\publish-check\LogisticsCore.deps.json
+C:\Users\ellya\PortfolioProjects\LogisticsCore\bin\Debug\net9.0\publish-check\LogisticsCore.runtimeconfig.json
+C:\Users\ellya\PortfolioProjects\LogisticsCore\bin\Debug\net9.0\publish-check\LogisticsCore.staticwebassets.endpoints.json
+C:\Users\ellya\PortfolioProjects\LogisticsCore\obj\Debug\net9.0\LogisticsCore.sourcelink.json
